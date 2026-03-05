@@ -75,48 +75,78 @@ One document, shared across marketing site and order flow.
 
 ---
 
-## 4. `marketingPage` — Marketing landing page content (singleton)
+## 4. `page` — Marketing page (document, multiple)
 
-Covers all editable content on `app/page.tsx`. Sections map 1:1 to components.
+Replaces the old singleton. Every marketing page is one document — homepage, `/mobilabonnement`, `/kundeservice`, `/om-oss`, etc. Body is a composable array of section blocks so editors can build pages freely.
 
-### 4a. Hero (`HeroSection`)
-| Field | Type |
-|-------|------|
-| `hero.headline` | string |
-| `hero.subheadline` | string |
-| `hero.ctaLabel` | string |
-| `hero.ctaHref` | string |
-| `hero.image` | image (optional) |
+| Field | Type | Notes |
+|-------|------|-------|
+| `title` | string | Page title (also used for `<title>` unless `seo.title` is set) |
+| `slug` | slug | URL path — `"/"` for homepage, `"mobilabonnement"` etc. |
+| `seo.title` | string | Optional override for `<title>` |
+| `seo.description` | string | Meta description |
+| `seo.image` | image | OG image |
+| `sections` | array of section blocks | Page body — see block types below |
 
-### 4b. Benefits (`BenefitsSection`)
-| Field | Type |
-|-------|------|
-| `benefits.heading` | string |
-| `benefits.items` | array of `{ icon: string, title: string, description: string }` |
+### Section block types
 
-### 4c. Trust (`TrustSection`)
-| Field | Type |
-|-------|------|
-| `trust.heading` | string |
-| `trust.logos` | array of `{ name: string, image: image }` |
-| `trust.stats` | array of `{ value: string, label: string }` |
+Each block is a typed object inside the `sections` array. The frontend renders a matching component per `_type`.
 
-### 4d. Switch / How it works (`SwitchSection`)
-| Field | Type |
-|-------|------|
-| `switch.heading` | string |
-| `switch.steps` | array of `{ number: number, title: string, description: string }` |
-| `switch.ctaLabel` | string |
-| `switch.ctaHref` | string |
+| `_type` | Fields | Used on |
+|---------|--------|---------|
+| `heroSection` | `headline`, `highlightText` (gold), `subtext`, `ctaLabel`, `ctaHref`, `secondaryCtaLabel`, `secondaryCtaHref`, `badges[]` | Homepage, landing pages |
+| `plansSection` | `heading`, `subheading`, `tabs[]` of `{ id, label }`, `showViewAll` | Homepage, `/mobilabonnement`, `/familie`, `/mobilt-bredband` |
+| `benefitsSection` | `eyebrow`, `heading`, `subheading`, `items[]` of `{ icon, title, description, color }` | Homepage, `/plussfordeler` |
+| `trustSection` | `stats[]` of `{ value, label, sub }`, `quote`, `quoteAuthor`, `badge` | Homepage |
+| `stepsSection` | `heading`, `subheading`, `steps[]` of `{ title, description, icon }` | Homepage, landing pages |
+| `faqSection` | `heading`, `subheading`, `items` → reference to `faqItem` docs, or inline | Homepage, `/kundeservice` |
+| `richTextSection` | `heading`, `body` (Portable Text) | `/om-oss`, `/vilkar`, `/priser`, static pages |
+| `contactFormSection` | `heading`, `subheading`, `fields[]` config | `/kontaktmeg`, `/bedrift` |
+| `productGridSection` | `heading`, `subheading`, `products[]` → reference to `plan` docs, `columns` | `/mobilt-bredband` (routers) |
+| `supportCategoriesSection` | `heading`, `categories[]` of `{ title, icon, href, description }` | `/kundeservice` |
+
+This keeps layouts in code (each block type = one React component) while content is fully editable.
 
 **GROQ:**
 ```groq
-*[_type == "marketingPage"][0]
+// Fetch page by slug
+*[_type == "page" && slug.current == $slug][0]{ ..., sections[]{ ... } }
+
+// Homepage
+*[_type == "page" && slug.current == "/"][0]{ ..., sections[]{ ... } }
 ```
 
 ---
 
-## 5. `orderTexts` — Order form UI strings (singleton)
+## 5. `article` — News / magazine article (document, multiple)
+
+Used for PlussMagasinet blog posts at `/nyheter/[slug]`.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `title` | string | Article headline |
+| `slug` | slug | URL path under `/nyheter/` |
+| `publishedAt` | datetime | Publish date |
+| `excerpt` | text | Short summary for listing cards and meta description |
+| `heroImage` | image | Featured image with alt text |
+| `body` | block (Portable Text) | Rich text — headings, bold, links, images, embedded CTAs |
+| `tags` | array of string | Optional tags for filtering |
+| `active` | boolean | Show/hide |
+
+**GROQ:**
+```groq
+// Listing (PlussMagasinet index)
+*[_type == "article" && active == true] | order(publishedAt desc) {
+  title, slug, publishedAt, excerpt, heroImage
+}
+
+// Single article
+*[_type == "article" && slug.current == $slug][0]
+```
+
+---
+
+## 6. `orderTexts` — Order form UI strings (singleton)
 
 Keeps all user-facing form copy editable without a deploy.
 
@@ -159,13 +189,14 @@ Keeps all user-facing form copy editable without a deploy.
 | `plan` | Document (many) | Marketing / product team |
 | `faqItem` | Document (many) | Marketing team |
 | `siteSettings` | Singleton | Dev / marketing |
-| `marketingPage` | Singleton | Marketing team |
+| `page` | Document (many) | Marketing team |
+| `article` | Document (many) | Marketing team |
 | `orderTexts` | Singleton | Marketing / dev |
 
 ## What stays in code (not Sanity)
 
+- Section block components (one React component per `_type` — layout lives in code, content in CMS)
 - Form field names and backend `variantId` serialization logic
 - Validation rules (`lib/validation.ts`)
 - Port date offset and holiday logic (`lib/dates.ts`)
 - Routing and URL structure
-- Component layout and design
