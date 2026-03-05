@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react'
 import type { Plan } from '@/lib/products'
-import { FAMILY_PLANS } from '@/lib/products'
 import { defaultPortDate } from '@/lib/dates'
 import type { FamilyFormState, FamilyMember, UIState } from '@/types/order'
 import { validateOwner, validateSubscription, hasErrors } from '@/lib/validation'
@@ -45,9 +44,10 @@ function initialState(plan: Plan): FamilyFormState {
 
 interface FamilyOrderFormProps {
   plan: Plan
+  plans: Plan[]
 }
 
-export default function FamilyOrderForm({ plan: initialPlan }: FamilyOrderFormProps) {
+export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrderFormProps) {
   const [plan, setPlan] = useState(initialPlan)
   const [showSelector, setShowSelector] = useState(false)
   const [state, setState] = useState<FamilyFormState>(() => initialState(initialPlan))
@@ -124,7 +124,7 @@ export default function FamilyOrderForm({ plan: initialPlan }: FamilyOrderFormPr
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       {showSelector ? (
         <PlanSelector
-          plans={FAMILY_PLANS}
+          plans={plans}
           selectedVariantId={plan.variantId}
           onSelect={(p) => { setPlan(p); setState((s) => ({ ...s, planVariantId: p.variantId })); setShowSelector(false) }}
           onClose={() => setShowSelector(false)}

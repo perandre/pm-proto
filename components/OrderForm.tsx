@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Plan } from '@/lib/products'
-import { INDIVIDUAL_PLANS } from '@/lib/products'
 import { defaultPortDate } from '@/lib/dates'
 import type { SingleFormState, UIState } from '@/types/order'
 import { validateOwner, validateSubscription, hasErrors } from '@/lib/validation'
@@ -44,9 +43,10 @@ function initialState(plan: Plan): SingleFormState {
 
 interface OrderFormProps {
   plan: Plan
+  plans: Plan[]
 }
 
-export default function OrderForm({ plan: initialPlan }: OrderFormProps) {
+export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) {
   const router = useRouter()
   const [plan, setPlan] = useState(initialPlan)
   const [showSelector, setShowSelector] = useState(false)
@@ -103,7 +103,7 @@ export default function OrderForm({ plan: initialPlan }: OrderFormProps) {
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
       {showSelector ? (
         <PlanSelector
-          plans={INDIVIDUAL_PLANS}
+          plans={plans}
           selectedVariantId={plan.variantId}
           onSelect={handlePlanSelect}
           onClose={() => setShowSelector(false)}
