@@ -2,20 +2,23 @@
 
 import { useState } from 'react'
 import type { OwnerState } from '@/types/order'
+import type { OrderTexts } from '@/types/sanity'
 import TextInput from '@/components/ui/TextInput'
 
 interface OwnerFormProps {
   state: OwnerState
   onChange: (patch: Partial<OwnerState>) => void
   errors: Partial<Record<keyof OwnerState, string>>
+  texts?: OrderTexts
 }
 
-export default function OwnerForm({ state, onChange, errors }: OwnerFormProps) {
+export default function OwnerForm({ state, onChange, errors, texts }: OwnerFormProps) {
+  const t = texts ?? {}
   const [showDiscount, setShowDiscount] = useState(!!state.discountCode)
 
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100">
-      <h3 className="mb-4 font-bold text-gray-900">Hvem skal være eier av abonnementet?</h3>
+      <h3 className="mb-4 font-bold text-gray-900">{t.ownerSectionHeader ?? 'Hvem skal være eier av abonnementet?'}</h3>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <TextInput
           label="Navn"
@@ -64,7 +67,7 @@ export default function OwnerForm({ state, onChange, errors }: OwnerFormProps) {
             onClick={() => setShowDiscount(true)}
             className="text-sm text-[#e05a2b] hover:underline"
           >
-            Har du en rabattkode?
+            {t.discountToggleLabel ?? 'Har du en rabattkode?'}
           </button>
         ) : (
           <TextInput

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import type { Plan } from '@/lib/products'
+import type { OrderTexts } from '@/types/sanity'
 import { defaultPortDate } from '@/lib/dates'
 import type { FamilyFormState, FamilyMember, UIState } from '@/types/order'
 import { validateOwner, validateSubscription, hasErrors } from '@/lib/validation'
@@ -45,9 +46,10 @@ function initialState(plan: Plan): FamilyFormState {
 interface FamilyOrderFormProps {
   plan: Plan
   plans: Plan[]
+  texts?: OrderTexts
 }
 
-export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrderFormProps) {
+export default function FamilyOrderForm({ plan: initialPlan, plans, texts }: FamilyOrderFormProps) {
   const [plan, setPlan] = useState(initialPlan)
   const [showSelector, setShowSelector] = useState(false)
   const [state, setState] = useState<FamilyFormState>(() => initialState(initialPlan))
@@ -108,7 +110,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
     setTimeout(() => setUiState('receipt'), 1500)
   }
 
-  if (uiState === 'loading') return <LoadingSpinner />
+  if (uiState === 'loading') return <LoadingSpinner text={texts?.loadingText} />
   if (uiState === 'receipt') {
     return (
       <Receipt
@@ -116,6 +118,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
         ownerName={state.owner.name}
         ownerEmail={state.owner.email}
         isEsim={state.members.some((m) => m.simType === 'esim')}
+        texts={texts}
       />
     )
   }
@@ -133,7 +136,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
         <PlanCard plan={plan} onChangePlan={() => setShowSelector(true)} />
       )}
 
-      <OwnerForm state={state.owner} onChange={patchOwner} errors={ownerErrors} />
+      <OwnerForm state={state.owner} onChange={patchOwner} errors={ownerErrors} texts={texts} />
 
       {state.members.map((member, i) => (
         <div key={i} className="flex flex-col gap-4">
@@ -163,6 +166,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
             onChange={(patch) => patchMember(i, patch as Partial<FamilyMember>)}
             errors={memberErrors[i] ?? {}}
             hideOwnerToggle
+            texts={texts}
           />
           <SimSection
             state={{
@@ -177,6 +181,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
             }}
             onChange={(patch) => patchMember(i, patch as Partial<FamilyMember>)}
             errors={memberErrors[i] ?? {}}
+            texts={texts}
           />
         </div>
       ))}
@@ -200,7 +205,7 @@ export default function FamilyOrderForm({ plan: initialPlan, plans }: FamilyOrde
           type="submit"
           className="w-full rounded-full bg-navy py-3.5 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto sm:px-10"
         >
-          Send bestilling →
+          {texts?.submitLabel ?? 'Send bestilling →'}
         </button>
       </div>
     </form>

@@ -1,20 +1,23 @@
 import type { SubscriptionState } from '@/types/order'
 import type { SimType } from '@/lib/products'
+import type { OrderTexts } from '@/types/sanity'
 import BorderedRadioCard from '@/components/ui/BorderedRadioCard'
 import HelpTooltip from '@/components/ui/HelpTooltip'
 import TextInput from '@/components/ui/TextInput'
 import { getPortDateRange, formatDate } from '@/lib/dates'
 
-const ESIM_HELP =
+const DEFAULT_ESIM_HELP =
   'eSIM er et digitalt SIM-kort innebygd i telefonen. Støttede enheter: iPhone 11+, Samsung Galaxy S20+, Note20+, Z Flip+, Google Pixel 3A+'
 
 interface SimSectionProps {
   state: SubscriptionState
   onChange: (patch: Partial<SubscriptionState>) => void
   errors: Partial<Record<keyof SubscriptionState, string>>
+  texts?: OrderTexts
 }
 
-export default function SimSection({ state, onChange, errors }: SimSectionProps) {
+export default function SimSection({ state, onChange, errors, texts }: SimSectionProps) {
+  const t = texts ?? {}
   const esimDisabled = !state.portExistingNumber
 
   const handleSimChange = (simType: SimType) => {
@@ -36,7 +39,7 @@ export default function SimSection({ state, onChange, errors }: SimSectionProps)
           value="physical"
           checked={state.simType === 'physical'}
           onChange={() => handleSimChange('physical')}
-          title="Vanlig SIM i posten"
+          title={t.simPhysicalLabel ?? 'Vanlig SIM i posten'}
         />
         <BorderedRadioCard
           name="sim_type"
@@ -44,14 +47,14 @@ export default function SimSection({ state, onChange, errors }: SimSectionProps)
           checked={state.simType === 'esim'}
           onChange={() => handleSimChange('esim')}
           disabled={esimDisabled}
-          title="eSIM"
-          badge={<HelpTooltip text={ESIM_HELP} />}
+          title={t.simEsimLabel ?? 'eSIM'}
+          badge={<HelpTooltip text={t.esimTooltip ?? DEFAULT_ESIM_HELP} />}
         />
       </div>
 
       {esimDisabled && (
         <p className="text-xs text-gray-500">
-          eSIM er kun tilgjengelig ved overføring av eksisterende nummer.
+          {t.esimDisabledNote ?? 'eSIM er kun tilgjengelig ved overføring av eksisterende nummer.'}
         </p>
       )}
 

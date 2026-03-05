@@ -1,0 +1,32 @@
+import { defineField, defineType } from 'sanity'
+
+export default defineType({
+  name: 'orderTexts',
+  title: 'Bestillingsskjema — tekster',
+  type: 'document',
+  fields: [
+    defineField({ name: 'ownerSectionHeader', title: 'Eierseksjon — overskrift', type: 'string', initialValue: 'Hvem skal være eier av abonnementet?' }),
+    defineField({ name: 'subscriberSectionHeader', title: 'Brukerseksjon — overskrift', type: 'string', initialValue: 'Er det du som skal bruke abonnementet?' }),
+    defineField({ name: 'portKeepLabel', title: 'Behold nummer — etikett', type: 'string', initialValue: 'Flytt eksisterende nummer' }),
+    defineField({ name: 'portKeepFee', title: 'Behold nummer — etableringskost', type: 'string', initialValue: 'Etablering kr 0,-' }),
+    defineField({ name: 'portNewLabel', title: 'Nytt nummer — etikett', type: 'string', initialValue: 'Nytt nummer' }),
+    defineField({ name: 'portNewFee', title: 'Nytt nummer — etableringskost', type: 'string', initialValue: 'Etablering kr 149,-' }),
+    defineField({ name: 'simPhysicalLabel', title: 'Fysisk SIM — etikett', type: 'string', initialValue: 'Vanlig SIM i posten' }),
+    defineField({ name: 'simEsimLabel', title: 'eSIM — etikett', type: 'string', initialValue: 'eSIM' }),
+    defineField({ name: 'esimTooltip', title: 'eSIM — hjelpetekst', type: 'text', rows: 3, initialValue: 'eSIM er et digitalt SIM-kort innebygd i telefonen. Støttede enheter: iPhone 11+, Samsung Galaxy S20+, Note20+, Z Flip+, Google Pixel 3A+' }),
+    defineField({ name: 'esimDisabledNote', title: 'eSIM deaktivert — merknad', type: 'string', initialValue: 'eSIM er kun tilgjengelig ved overføring av eksisterende nummer.' }),
+    defineField({ name: 'directoryListingLabel', title: 'Katalogoppføring — etikett', type: 'string', initialValue: 'Oppføring i opplysningstjenester (kr 0,-)' }),
+    defineField({ name: 'directoryListingInfo', title: 'Katalogoppføring — infotekst', type: 'text', rows: 2, initialValue: 'Vil du ha nummeret ditt i telefonkatalogen og 1881? Velg Ja for oppføring i opplysningstjenestene (gratis).' }),
+    defineField({ name: 'discountToggleLabel', title: 'Rabattkode — lenketekst', type: 'string', initialValue: 'Har du en rabattkode?' }),
+    defineField({ name: 'termsPrefix', title: 'Vilkår — prefiks', type: 'string', initialValue: 'Jeg godtar' }),
+    defineField({ name: 'termsLinkLabel', title: 'Vilkår — lenketekst', type: 'string', initialValue: 'vilkår' }),
+    defineField({ name: 'privacyLinkLabel', title: 'Personvern — lenketekst', type: 'string', initialValue: 'personvernerklæring' }),
+    defineField({ name: 'submitLabel', title: 'Send-knapp', type: 'string', initialValue: 'Send bestilling →' }),
+    defineField({ name: 'loadingText', title: 'Lastestatus', type: 'string', initialValue: 'Sender bestilling…' }),
+    defineField({ name: 'receiptHeading', title: 'Kvittering — overskrift', type: 'string', initialValue: 'Bestilling mottatt!' }),
+    defineField({ name: 'receiptBody', title: 'Kvittering — brødtekst', type: 'string', initialValue: 'Vi har sendt en bekreftelse til din e-post.' }),
+    defineField({ name: 'esimQrHeading', title: 'eSIM QR — overskrift', type: 'string', initialValue: 'Din eSIM QR-kode' }),
+    defineField({ name: 'esimQrInstruction', title: 'eSIM QR — instruksjon', type: 'string', initialValue: 'Skann koden med telefonen din for å aktivere eSIM-kortet.' }),
+  ],
+  preview: { prepare: () => ({ title: 'Bestillingsskjema — tekster' }) },
+})

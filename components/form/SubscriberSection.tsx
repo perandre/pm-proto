@@ -1,4 +1,5 @@
 import type { SubscriptionState } from '@/types/order'
+import type { OrderTexts } from '@/types/sanity'
 import InlineRadio from '@/components/ui/InlineRadio'
 import BorderedRadioCard from '@/components/ui/BorderedRadioCard'
 import TextInput from '@/components/ui/TextInput'
@@ -8,9 +9,9 @@ interface SubscriberSectionProps {
   state: SubscriptionState
   onChange: (patch: Partial<SubscriptionState>) => void
   errors: Partial<Record<keyof SubscriptionState, string>>
-  /** For family members, owner info is never copied */
   hideOwnerToggle?: boolean
   label?: string
+  texts?: OrderTexts
 }
 
 export default function SubscriberSection({
@@ -18,13 +19,16 @@ export default function SubscriberSection({
   onChange,
   errors,
   hideOwnerToggle = false,
-  label = 'Er det du som skal bruke abonnementet?',
+  label,
+  texts,
 }: SubscriberSectionProps) {
+  const t = texts ?? {}
+  const sectionLabel = label ?? t.subscriberSectionHeader ?? 'Er det du som skal bruke abonnementet?'
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 flex flex-col gap-4">
       {!hideOwnerToggle && (
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <span className="font-bold text-gray-900 text-sm">{label}</span>
+          <span className="font-bold text-gray-900 text-sm">{sectionLabel}</span>
           <InlineRadio
             name="subscriber_is_owner"
             options={[
@@ -68,16 +72,16 @@ export default function SubscriberSection({
             value="port"
             checked={state.portExistingNumber}
             onChange={() => onChange({ portExistingNumber: true })}
-            title="Flytt eksisterende nummer"
-            subtitle={<>Etablering kr <strong>0,-</strong></>}
+            title={t.portKeepLabel ?? 'Flytt eksisterende nummer'}
+            subtitle={t.portKeepFee ?? 'Etablering kr 0,-'}
           />
           <BorderedRadioCard
             name="port_type"
             value="new"
             checked={!state.portExistingNumber}
             onChange={() => onChange({ portExistingNumber: false })}
-            title="Nytt nummer"
-            subtitle={<>Etablering kr <strong>149,-</strong></>}
+            title={t.portNewLabel ?? 'Nytt nummer'}
+            subtitle={t.portNewFee ?? 'Etablering kr 149,-'}
           />
         </div>
       </div>
@@ -97,7 +101,7 @@ export default function SubscriberSection({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <span className="text-sm font-semibold text-gray-900">
-          Oppføring i opplysningstjenester (kr 0,-)
+          {t.directoryListingLabel ?? 'Oppføring i opplysningstjenester (kr 0,-)'}
         </span>
         <InlineRadio
           name="directory_listing"
@@ -111,8 +115,7 @@ export default function SubscriberSection({
       </div>
 
       <InfoBox>
-        Vil du ha nummeret ditt i telefonkatalogen og 1881? Velg <strong>Ja</strong> for oppføring i
-        opplysningstjenestene (gratis).
+        {t.directoryListingInfo ?? 'Vil du ha nummeret ditt i telefonkatalogen og 1881? Velg Ja for oppføring i opplysningstjenestene (gratis).'}
       </InfoBox>
     </div>
   )

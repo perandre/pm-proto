@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Plan } from '@/lib/products'
+import type { OrderTexts } from '@/types/sanity'
 import { defaultPortDate } from '@/lib/dates'
 import type { SingleFormState, UIState } from '@/types/order'
 import { validateOwner, validateSubscription, hasErrors } from '@/lib/validation'
@@ -44,9 +45,10 @@ function initialState(plan: Plan): SingleFormState {
 interface OrderFormProps {
   plan: Plan
   plans: Plan[]
+  texts?: OrderTexts
 }
 
-export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) {
+export default function OrderForm({ plan: initialPlan, plans, texts }: OrderFormProps) {
   const router = useRouter()
   const [plan, setPlan] = useState(initialPlan)
   const [showSelector, setShowSelector] = useState(false)
@@ -87,7 +89,7 @@ export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) 
     setTimeout(() => setUiState('receipt'), 1500)
   }
 
-  if (uiState === 'loading') return <LoadingSpinner />
+  if (uiState === 'loading') return <LoadingSpinner text={texts?.loadingText} />
   if (uiState === 'receipt') {
     return (
       <Receipt
@@ -95,6 +97,7 @@ export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) 
         ownerName={state.owner.name}
         ownerEmail={state.owner.email}
         isEsim={state.subscription.simType === 'esim'}
+        texts={texts}
       />
     )
   }
@@ -112,18 +115,20 @@ export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) 
         <PlanCard plan={plan} onChangePlan={() => setShowSelector(true)} />
       )}
 
-      <OwnerForm state={state.owner} onChange={patchOwner} errors={ownerErrors} />
+      <OwnerForm state={state.owner} onChange={patchOwner} errors={ownerErrors} texts={texts} />
 
       <SubscriberSection
         state={state.subscription}
         onChange={patchSubscription}
         errors={subErrors}
+        texts={texts}
       />
 
       <SimSection
         state={state.subscription}
         onChange={patchSubscription}
         errors={subErrors}
+        texts={texts}
       />
 
       <OrderSummary
@@ -143,7 +148,7 @@ export default function OrderForm({ plan: initialPlan, plans }: OrderFormProps) 
           type="submit"
           className="w-full rounded-full bg-navy py-3.5 text-sm font-semibold text-white transition hover:opacity-90 sm:w-auto sm:px-10"
         >
-          Send bestilling →
+          {texts?.submitLabel ?? 'Send bestilling →'}
         </button>
       </div>
     </form>

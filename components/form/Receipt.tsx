@@ -1,13 +1,16 @@
 import type { Plan } from '@/lib/products'
+import type { OrderTexts } from '@/types/sanity'
 
 interface ReceiptProps {
   plan: Plan
   ownerName: string
   ownerEmail: string
   isEsim: boolean
+  texts?: OrderTexts
 }
 
-export default function Receipt({ plan, ownerName, ownerEmail, isEsim }: ReceiptProps) {
+export default function Receipt({ plan, ownerName, ownerEmail, isEsim, texts }: ReceiptProps) {
+  const t = texts ?? {}
   return (
     <div className="rounded-2xl bg-white p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-5 text-center">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
@@ -17,9 +20,9 @@ export default function Receipt({ plan, ownerName, ownerEmail, isEsim }: Receipt
       </div>
 
       <div>
-        <h2 className="text-xl font-bold text-gray-900">Bestilling mottatt!</h2>
+        <h2 className="text-xl font-bold text-gray-900">{t.receiptHeading ?? 'Bestilling mottatt!'}</h2>
         <p className="mt-1 text-sm text-gray-600">
-          Takk, {ownerName}. Vi har sendt en bekreftelse til{' '}
+          Takk, {ownerName}. {t.receiptBody ?? 'Vi har sendt en bekreftelse til'}{' '}
           <strong>{ownerEmail}</strong>.
         </p>
       </div>
@@ -31,13 +34,13 @@ export default function Receipt({ plan, ownerName, ownerEmail, isEsim }: Receipt
 
       {isEsim && (
         <div className="flex flex-col items-center gap-2">
-          <p className="text-sm font-semibold text-gray-900">Din eSIM QR-kode</p>
+          <p className="text-sm font-semibold text-gray-900">{t.esimQrHeading ?? 'Din eSIM QR-kode'}</p>
           {/* In Phase 2 this will show the real QR code from the API */}
           <div className="flex h-40 w-40 items-center justify-center rounded-xl bg-gray-100 text-xs text-gray-400">
             QR-kode vises her
           </div>
           <p className="text-xs text-gray-500 max-w-xs">
-            Skann koden med telefonen din for å aktivere eSIM-kortet.
+            {t.esimQrInstruction ?? 'Skann koden med telefonen din for å aktivere eSIM-kortet.'}
           </p>
         </div>
       )}
