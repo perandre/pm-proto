@@ -62,7 +62,9 @@ Content-Type: application/json
 ```
 
 React sends clean JSON. The proxy serializes to `application/x-www-form-urlencoded`
-and POSTs to `https://bestilling.plussmobil.no/bestill-mobilabonnement/[plan-slug]/`.
+and POSTs to:
+- Single: `https://bestilling.plussmobil.no/bestill-mobilabonnement/[plan-slug]/`
+- Family: `https://bestilling.plussmobil.no/bestill-mobilabonnement-familie/`
 
 **Success** — `page_content` is present but ignored. We detect success by the
 *absence* of a `validation.valid = false` field and transition to the receipt state.
@@ -86,7 +88,8 @@ We do extract `ga_event` for analytics:
 
 ### 2. Apply Discount Code
 ```
-POST /signup_single/apply_discount_code/
+POST /signup_single/apply_discount_code/    (single)
+POST /signup_family/apply_discount_code/    (family — to be confirmed against live site)
 Content-Type: application/x-www-form-urlencoded
 ```
 
@@ -147,12 +150,18 @@ Response contains the QR code data, rendered in a modal on the receipt screen.
 
 ```
 app/api/
-├── submit/route.ts     → POST /bestill-mobilabonnement/[slug]/
-├── discount/route.ts   → POST /signup_single/apply_discount_code/
+├── submit/route.ts     → POST /bestill-mobilabonnement/[slug]/ (single)
+│                         POST /bestill-mobilabonnement-familie/ (family)
+├── discount/route.ts   → POST /signup_single/apply_discount_code/ (single)
+│                         POST /signup_family/apply_discount_code/ (family, TBC)
 └── qr-code/route.ts    → POST /signup_single/mobile_qr_code/
 ```
 
 `summary` and `signup` (polling) routes are not needed.
+
+**Note:** The family endpoints (`/signup_family/...`) need to be confirmed against the
+live site. The single endpoints use `/signup_single/...` — the family flow may use
+`/signup_family/...` or reuse the same endpoints. Verify before Phase 2 implementation.
 
 ### Proxy contract
 - React client sends JSON

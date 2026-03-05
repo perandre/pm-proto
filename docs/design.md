@@ -218,3 +218,32 @@ Mobile: stacked full width
 - Between form rows: `mb-4`
 - Between inline radios: `gap-3`
 - Between feature grid items: `gap-x-4 gap-y-2`
+
+---
+
+## Header
+
+- No mobile menu / hamburger — header is just a logo bar on all screen sizes.
+
+---
+
+## Accessibility
+
+Custom radio components (BorderedRadioCard, InlineRadio) must be keyboard-accessible:
+- Use `role="radio"` and `aria-checked` on each option, wrapped in `role="radiogroup"`
+- Arrow keys navigate between options within a group
+- Space/Enter selects the focused option
+- Each radio group needs an accessible label (via `aria-labelledby` or `aria-label`)
+
+Plan selector (expanded list):
+- Keyboard navigation with arrow keys
+- Escape closes the list
+
+Form inputs:
+- All inputs have associated `<label>` elements (not just visual labels)
+- Error messages linked via `aria-describedby`
+- Required fields marked with `aria-required="true"`
+
+Focus management:
+- After submit error, focus the first invalid field
+- After loading completes and receipt shows, move focus to the receipt heading

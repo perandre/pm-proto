@@ -15,7 +15,9 @@ Simulates the full buying flow with hardcoded data and fake submission.
 
 No React Hook Form. No Zod. No Sanity. No proxy routes. No serialization.
 Family member list managed with plain `useState<Member[]>`.
-"Submit" fakes a 1.5s loading state then shows a hardcoded receipt screen.
+"Submit" runs basic required-field validation (inline `if (!field)` checks with
+inline error messages) then fakes a 1.5s loading state and shows a hardcoded receipt screen.
+Discount code: shows fake success with a mock 10% discount applied to the displayed price.
 
 ### Phase 1 project structure
 
@@ -41,6 +43,7 @@ plussmobil/
 │   ├── DiscountCode.tsx
 │   ├── TermsCheckbox.tsx
 │   ├── Receipt.tsx                           # Hardcoded confirmation screen
+│   ├── LoadingSpinner.tsx                    # Spinner shown during submit
 │   └── ui/
 │       ├── TextInput.tsx
 │       ├── InlineRadio.tsx
@@ -108,7 +111,7 @@ setTimeout(() => setUIState('receipt'), 1500)
 9. SubscriberSection — copy-owner toggle, porting, directory listing, SIM type, date
 10. Reactive rules — eSIM disabled for new number, date range switching on SIM change
 11. OrderSummary — derived from state, no API
-12. DiscountCode — collapsible, apply button does nothing in Phase 1 (or shows fake success)
+12. DiscountCode — collapsible, apply button shows fake success with mock 10% discount
 13. TermsCheckbox + submit button
 14. Loading + Receipt screens
 15. Single order page — wire all sections
@@ -172,6 +175,8 @@ Paths match the original site exactly so external deep-links continue to work.
 The slug is read once on mount to set the initial `planVariantId` in form state.
 Navigating between plans (via "Endre abonnement?") updates the URL with
 `router.replace` so the address bar stays accurate without a full page reload.
+On the family page there are no slugs — plan switching only updates form state,
+the URL stays at `/bestill-mobilabonnement-familie/`.
 
 ```
 app/
@@ -182,7 +187,8 @@ app/
     └── page.tsx
 ```
 
-Unknown slugs fall back to the default plan (1GB Standard) rather than 404.
+Unknown slugs fall back to the default plan (10GB Standard) rather than 404.
+This matches the `/` redirect target.
 
 ---
 
@@ -263,7 +269,34 @@ export function serializeSingleOrder(data: SingleOrderForm, planSlug: string): U
   p.set('data[OrderSubscription][0][port_date]', data.subscription.portDate)
   p.set('data[ProductOption][0][200603201022420137]', data.subscription.directoryListing ? '200603201022420137' : '')
   p.set('data[Request][base_url]', `/bestill-mobilabonnement/${planSlug}/`)
-  // ... conditional fields
+  // ... conditional fields (subscriber name/birthdate if copy_owner_data=0, phone_number if porting=1)
+  return p
+}
+
+export function serializeFamilyOrder(data: FamilyOrderForm): URLSearchParams {
+  const p = new URLSearchParams()
+  p.set('data[FamilyPackage][rate_plan_variant_id]', data.planVariantId)
+  p.set('data[FamilyPackage][members_amount]', String(data.members.length))
+  p.set('data[Order][customer_name]', data.owner.name)
+  p.set('data[Order][customer_phone]', data.owner.phone)
+  p.set('data[Order][customer_email]', data.owner.email)
+  p.set('data[Order][customer_number]', data.owner.personalId)
+  p.set('data[Order][terms_agreement]', '1')
+  p.set('data[Order][order_step]', '1')
+  data.members.forEach((m, i) => {
+    p.set(`data[OrderSubscription][${i}][rate_plan_variant_id]`, data.planVariantId)
+    p.set(`data[OrderSubscription][${i}][id]`, '')
+    p.set(`data[OrderSubscription][${i}][owner_name]`, m.subscriberName)
+    p.set(`data[OrderSubscription][${i}][owner_birthdate]`, m.subscriberBirthdate)
+    p.set(`data[OrderSubscription][${i}][porting]`, m.portExistingNumber ? '1' : '0')
+    if (m.portExistingNumber && m.existingNumber) {
+      p.set(`data[OrderSubscription][${i}][phone_number]`, m.existingNumber)
+    }
+    p.set(`data[ProductOption][${i}][200603201022420137]`, m.directoryListing ? '200603201022420137' : '')
+    p.set(`data[OrderSubscription][${i}][sim_card_type]`, m.simType === 'esim' ? '2' : '1')
+    p.set(`data[OrderSubscription][${i}][port_date]`, m.portDate)
+  })
+  p.set('data[Request][base_url]', '/bestill-mobilabonnement-familie/')
   return p
 }
 ```

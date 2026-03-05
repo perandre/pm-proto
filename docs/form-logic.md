@@ -86,10 +86,11 @@ Dates are computed client-side from `new Date()` using business-day offsets:
 | SIM Type | Offset from today | Max |
 |----------|--------------------|-----|
 | Physical (1) | +8 business days | +75 business days |
-| eSIM (2) | +1 business day | +75 business days |
+| eSIM (2) | +2 business days | +75 business days |
 
 The offsets are derived from the original site's rendered dates (observed 2026-03-05):
-physical min = 17.03 (+8 days), eSIM min = 09.03 (+2 days). Treat these as approximate —
+physical min = 17.03.2026 (+8 business days), eSIM min = 09.03.2026 (+2 business days).
+Business days = skip weekends (Sat/Sun). Treat these as approximate —
 confirm against live site when building. Implement in `lib/dates.ts` as a pure function
 that takes `new Date()` and returns `{ min, max, default }` per SIM type.
 
