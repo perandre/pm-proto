@@ -18,6 +18,13 @@ Builds will fail with "Configuration must contain projectId" if these are missin
 - Schemas: `plan`, `faqItem`, `article`, `orderTexts`, `page`, `siteSettings`
 - Plans seeded via `npx tsx scripts/seed-plans.ts`
 
+## Agent skills (reference docs)
+When working with Sanity, content modeling, or SEO, consult these:
+- `.agents/skills/sanity-best-practices/` — Sanity patterns, schemas, GROQ, Next.js integration, studio structure
+- `.agents/skills/content-modeling-best-practices/` — content reuse, references, taxonomy
+- `.agents/skills/content-experimentation-best-practices/` — A/B testing, experiment design
+- `.agents/skills/seo-aeo-best-practices/` — structured data, technical SEO, E-E-A-T
+
 ## Key conventions
 - Tailwind custom colors via `@theme` in `app/globals.css` (no tailwind.config.ts)
 - `bg-navy`, `text-navy`, `bg-gold` etc. from `--color-navy: #1a2b4a`, `--color-gold: #f5c518`

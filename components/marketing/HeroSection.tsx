@@ -94,7 +94,7 @@ export default function HeroSection() {
           <h1 className="animate-fade-up delay-1 text-4xl sm:text-5xl md:text-6xl lg:text-[4.2rem] font-bold leading-[1.08] tracking-tight">
             <span className="text-white">Mobilabonnement med</span>
             <br />
-            <span className="text-gold">alltid noe ekstra</span>
+            <span className="text-gold">det lille ekstra</span>
           </h1>
 
           {/* Subtext */}
