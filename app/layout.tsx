@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Bricolage_Grotesque, Figtree } from 'next/font/google'
+import { SanityLive } from '@/lib/sanity/client'
 import './globals.css'
 
 const bricolage = Bricolage_Grotesque({
@@ -23,7 +24,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="no" className={`${bricolage.variable} ${figtree.variable}`}>
-      <body className="min-h-screen bg-page">{children}</body>
+      <body className="min-h-screen bg-page">
+        {children}
+        <SanityLive />
+      </body>
     </html>
   )
 }

@@ -9,6 +9,7 @@ Vercel. Build env vars must be set in Vercel project settings:
 NEXT_PUBLIC_SANITY_PROJECT_ID=rynfsue0
 NEXT_PUBLIC_SANITY_DATASET=production
 SANITY_API_TOKEN=<editor token>
+SANITY_API_READ_TOKEN=<viewer token — used by defineLive>
 ```
 Builds will fail with "Configuration must contain projectId" if these are missing.
 

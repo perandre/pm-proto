@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getIndividualPlans, getPlanBySlug, getOrderTexts } from '@/lib/sanity/queries'
+import { getIndividualPlans, getPlanBySlug, getOrderTexts, getAllPlanSlugs } from '@/lib/sanity/queries'
 import { DEFAULT_INDIVIDUAL_SLUG } from '@/lib/products'
 import Header from '@/components/Header'
 import TabToggle from '@/components/TabToggle'
@@ -33,6 +33,5 @@ export default async function SinglePlanPage({ params }: Props) {
 }
 
 export async function generateStaticParams() {
-  const plans = await getIndividualPlans()
-  return plans.map((p) => ({ slug: p.slug }))
+  return getAllPlanSlugs('individual')
 }
